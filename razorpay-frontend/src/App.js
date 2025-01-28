@@ -70,38 +70,40 @@ const App = () => {
         key: "RAZORPAY_KEY_ID", // Replace with your Razorpay key
         amount: orderData.amount , 
         currency: "INR",
-        name: "Zymo",
-        description: "title",
-        image: "https://picsum.photos/id/237/200/300",
+        name: "Zymo",//Your Business/Enterprise name
+        description: "title", //Description of the purchase item
+        image: "https://picsum.photos/id/237/200/300",//Link to an image (usually your business logo) shown on the Checkout form.
         order_id: orderData.id, // Use the order ID from the backend
         handler: async function (response){
           // console.log("Started handling the response");
           const data = {
             ...response,
           }
-          await axios.post('http://localhost:5000/api/v1/payment/verifyPayment', data);
-          const jsonRes=JSON.stringify(response);
-          // console.log("Handled the response");
-          console.log(jsonRes);
+          const res=await axios.post('http://localhost:5000/api/v1/payment/verifyPayment', data);
+          // const jsonRes=JSON.stringify(response);
+          console.log("Handled the response");
+          console.log(res.data);
         },
         theme: {
-          color: "#3399cc",
+          color: "#edff8d",
+          backdrop_color: "#000000",
         },
-        prefill: {
+        prefill: {//Autofill customer contact details, especially phone number to ease form completion(optional)
           name: "John Doe", 
           email: "john.doe@example.com",
+          contact: "9999999999",
         },
       };
 
       var rzp1 = new window.Razorpay(options);
-      rzp1.on('payment.failed', function (response){
-        alert(response.error.code);
-        alert(response.error.description);
-        alert(response.error.source);
-        alert(response.error.step);
-        alert(response.error.reason);
-        alert(response.error.metadata.order_id);
-        alert(response.error.metadata.payment_id);
+      rzp1.on('payment.failed', async function(response) {
+        console.log('Payment failed:', response.error);
+        console.log(response.error.metadata.order_id);
+        console.log(response.error.metadata.payment_id);
+      });
+
+      rzp1.on('payment.error', function (response) {
+        console.log('Payment error:', response.error);
       });
 
       rzp1.open();

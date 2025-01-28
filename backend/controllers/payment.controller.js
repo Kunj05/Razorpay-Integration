@@ -44,7 +44,7 @@ export const verifyPayment = async (req, res) => {
                 message: "Razorpay order ID, payment ID, and signature are required.",
             });
         }
-
+        // console.log("Start");
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
                 .update(sign.toString())
