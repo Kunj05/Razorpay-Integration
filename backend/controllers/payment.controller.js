@@ -1,6 +1,5 @@
 import razorpay from '../config/Razorpay.js';
 import crypto from 'crypto';
-import emailjs from 'emailjs-com';
 
 export const createOrder = async (req, res) => {
     // console.log("Creating  order");
@@ -72,44 +71,6 @@ export const verifyPayment = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Internal Server Error: Could not verify payment",
-            error: error.message,
-        });
-    }
-};
-
-const sendPaymentSuccessEmail = async (req, res) => {
-    const { orderId, paymentId, userEmail } = req.body;
-    try {
-        if (!orderId || !paymentId || !userEmail) {
-            return res.status(400).json({
-                success: false,
-                message: "Order ID, Payment ID, and User Email are required."
-            });
-        }
-
-        const templateParams = {
-            order_id: orderId,
-            payment_id: paymentId,
-            to_email: userEmail,
-        };
-
-        await emailjs.send(
-            process.env.EMAILJS_SERVICE_ID,
-            process.env.EMAILJS_TEMPLATE_ID,
-            templateParams,
-            process.env.EMAILJS_USER_ID
-        );
-
-        console.log(`Sending payment success email for order ${orderId} and payment ${paymentId}`);
-        return res.status(200).json({
-            success: true,
-            message: "Payment success email sent."
-        });
-    } catch (error) {
-        console.error("Error sending payment success email:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error: Could not send email",
             error: error.message,
         });
     }
