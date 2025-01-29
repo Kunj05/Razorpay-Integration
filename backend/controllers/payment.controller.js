@@ -1,8 +1,9 @@
 import razorpay from '../config/Razorpay.js';
 import crypto from 'crypto';
+import emailjs from 'emailjs-com';
 
 export const createOrder = async (req, res) => {
-    console.log("Creating  order");
+    // console.log("Creating  order");
     const {amount,currency } = req.body;
     try {
         const options = {
@@ -13,8 +14,8 @@ export const createOrder = async (req, res) => {
         };
         const response = await razorpay.orders.create(options);
         if (response) {
-            console.log("Order created successfully");
-            console.log(response);
+            // console.log("Order created successfully");
+            // console.log(response);
             res.status(200).json({ 
                 success: true,
                 data: response,
@@ -35,7 +36,7 @@ export const createOrder = async (req, res) => {
 };
 
 export const verifyPayment = async (req, res) => {
-    console.log("Verify the payment");
+    // console.log("Verifying the payment");
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -44,7 +45,7 @@ export const verifyPayment = async (req, res) => {
                 message: "Razorpay order ID, payment ID, and signature are required.",
             });
         }
-        // console.log("Start");
+        // console.log("Starting payment verification");
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
                 .update(sign.toString())
@@ -60,7 +61,7 @@ export const verifyPayment = async (req, res) => {
                 message: "Payment verified successfully" 
             });
         } else {
-            console.log("Invalid payment signature");
+            // console.log("Invalid payment signature");
             return res.status(400).json({ 
                 success: false, 
                 error: 'Invalid payment signature' 
@@ -76,20 +77,33 @@ export const verifyPayment = async (req, res) => {
     }
 };
 
-export const sendPaymentSuccessEmail = async (req, res) => {
-    const { orderId, paymentId } = req.body;
+const sendPaymentSuccessEmail = async (req, res) => {
+    const { orderId, paymentId, userEmail } = req.body;
     try {
-        if (!orderId || !paymentId) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Order ID and Payment ID are required." 
+        if (!orderId || !paymentId || !userEmail) {
+            return res.status(400).json({
+                success: false,
+                message: "Order ID, Payment ID, and User Email are required."
             });
         }
 
+        const templateParams = {
+            order_id: orderId,
+            payment_id: paymentId,
+            to_email: userEmail,
+        };
+
+        await emailjs.send(
+            process.env.EMAILJS_SERVICE_ID,
+            process.env.EMAILJS_TEMPLATE_ID,
+            templateParams,
+            process.env.EMAILJS_USER_ID
+        );
+
         console.log(`Sending payment success email for order ${orderId} and payment ${paymentId}`);
-        return res.status(200).json({ 
-            success: true, 
-            message: "Payment success email sent." 
+        return res.status(200).json({
+            success: true,
+            message: "Payment success email sent."
         });
     } catch (error) {
         console.error("Error sending payment success email:", error);
