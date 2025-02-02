@@ -3,6 +3,7 @@
 # dependencies
 /razorpay-frontend/node_modules
 /backend/node_modules
+/twillo_backend/node_modules
 /backend/.env
 /razorpay-frontend/.env
 /node_modules

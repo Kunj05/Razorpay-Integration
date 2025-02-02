@@ -12,12 +12,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
-    "razorpay": "^2.9.5"
+    "razorpay": "^2.9.5",
+    "twilio": "^5.4.3"
   }
 }
