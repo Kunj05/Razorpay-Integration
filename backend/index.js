@@ -5,7 +5,7 @@ import  paymentRoutes from "./routes/payment.route.js"
 const app = express()
 
 app.use(cors({
-    origin: ['http://localhost:3000'], // Add localhost to the allowed origins
+    origin: ['http://localhost:5173'], // Add localhost to the allowed origins
     credentials: true,
 }));
  
