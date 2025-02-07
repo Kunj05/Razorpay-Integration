@@ -14,31 +14,35 @@ const subaccountSid = process.env.TWILIO_ACCOUNT_SUBACCOUNT_SID;
 const client = twilio(accountSid, authToken);
 
 
-async function sendWhatsAppMessage(to, message) {
-    try {
       const response = await client.messages.create({
         body: message,
         from: 'whatsapp:+14**********', // Your Twilio Sandbox Number
         to: `whatsapp:${to}`,
       });
       console.log(`Message sent to ${to}: ${response.sid}`);
-    } catch (error) {
-      console.error(`Failed to send message: ${error}`);
-    }
-}
-
-app.post('/incoming', (req, res) => {
-  const message = req.body;
-  console.log(`Received message from ${message.From}: ${message.Body}`);
-  const twiml = new MessagingResponse();
-  twiml.message(`You said: ${message.Body}`);
-  res.writeHead(200, { 'Content-Type': 'text/xml' });
-  res.end(twiml.toString());
-});
 
 
-app.listen(port, () => { 
-    console.log(`Server running on http://localhost:${port}`); 
-});
+//when using message service 
 
-sendWhatsAppMessage('+*******number of sender', 'Hello from Twilio WhatsApp API!'); // Replace with your phone number
+        const response = await client.messages.create({
+            body: message,
+            messagingServiceSid: 'MGXXXXXXXXXXXXXXX', // Your Twilio Messaging Service SID
+            to: `whatsapp:${to}`,
+        });
+
+        console.log(`Message sent to ${to}: ${response.sid}`);
+
+
+//When having template and using the message service 
+
+        const response = await client.messages.create({
+            messagingServiceSid: 'MGXXXXXXXXXXXXXXX', // Your Twilio Messaging Service SID
+            contentSid: 'HXXXXXXXXXXXXXXX', // Your pre-approved Twilio Template SID
+            contentVariables: JSON.stringify({ 1: "John Doe" }), // Variables for the template
+            to: `whatsapp:${to}`,
+        });
+
+        console.log(`Template message sent to ${to}: ${response.sid}`);
+
+
+
